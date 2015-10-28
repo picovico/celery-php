@@ -3,19 +3,24 @@
 /* Include namespaced code only if PhpAmqpLib available */
 if(class_exists('PhpAmqpLib\Connection\AMQPConnection'))
 {
-	require_once('amqplibconnector.php');
-	require_once('amqplibconnectorssl.php');
+	require_once(__DIR__.'/amqplibconnector.php');
+	require_once(__DIR__.'/amqplibconnectorssl.php');
 
 }
 
 /* Include only if predis available */
 if(class_exists('Predis\Autoloader'))
 {
-	require_once('redisconnector.php');
+	require_once(__DIR__.'/redisconnector.php');
+}
+
+/* Include only if AWS-SDK available */
+if(class_exists('Aws\Sqs\SqsClient')){
+	require_once(__DIR__.'/sqsconnector.php');
 }
 
 /* Including the PECL connector never fails */
-require_once('amqppeclconnector.php');
+require_once(__DIR__.'/amqppeclconnector.php');
 
 /**
  * Abstraction for AMQP client libraries
@@ -46,25 +51,25 @@ abstract class AbstractAMQPConnector
 	 */
 	static function GetConcreteByName($name)
 	{
-		if($name == 'pecl')
-		{
-			return new PECLAMQPConnector();
-		}
-		elseif($name == 'php-amqplib')
-		{
-			return new AMQPLibConnector();
-		}
-		elseif($name == 'php-amqplib-ssl')
-		{
-			return new AMQPLibConnectorSsl();
-		}
-		elseif($name == 'redis')
-		{
-			return new RedisConnector();
-		}
-		else
-		{
-			throw new Exception('Unknown extension name ' . $name);
+		switch(strtolower($name)){
+			case "pecl":
+				return new PECLAMQPConnector();
+			break;
+			case "php-amqplib":
+				return new AMQPLibConnector();
+			break;
+			case "php-amqplib-ssl":
+				return new AMQPLibConnectorSsl();
+			break;
+			case "redis":
+				return new RedisConnector();
+			break;
+			case "sqs":
+				return new SQSConnector();
+			break;
+			default:
+				throw new Exception('Unknown extension name ' . $name);
+			break;
 		}
 	}
 
@@ -85,6 +90,9 @@ abstract class AbstractAMQPConnector
 		elseif(class_exists('PhpAmqpLib\Connection\AMQPConnection'))
 		{
 			return 'php-amqplib';
+		}
+		elseif(class_exists('Aws\Sqs\SqsClient')){
+			return 'sqs';
 		}
 		else
 		{

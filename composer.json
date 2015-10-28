@@ -20,7 +20,7 @@
     "suggest": {
 	    "videlalvaro/php-amqplib": "Adds support for the php-amqplib, AMQP library for PHP, backend",
         "predis/predis": "Adds support for the predis, PHP client library for Redis, backend",
-        "aws/awsk-sdk-php" : "Adds support for the sqs, Messaging service from Amazon AWS, backend. "
+        "aws/aws-sdk-php" : "Adds support for the sqs, Messaging service from Amazon AWS, backend. "
     },
     "autoload": {
         "classmap": ["celery.php"]
